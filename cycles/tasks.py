@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -8,9 +9,6 @@ from django_apscheduler.jobstores import DjangoJobStore
 
 logger = logging.getLogger("cycles")
 
-scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
-scheduler.add_jobstore(DjangoJobStore(), "default")
-
 
 def daily_send_reminders():
     """Tarea diaria: enviar recordatorios pendientes."""
@@ -19,9 +17,8 @@ def daily_send_reminders():
 
 
 def start_scheduler():
-    if scheduler.running:
-        return
-
+    scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
+    scheduler.add_jobstore(DjangoJobStore(), "default")
     scheduler.add_job(
         daily_send_reminders,
         trigger=CronTrigger(hour=9, minute=0),
@@ -33,8 +30,10 @@ def start_scheduler():
     logger.info("Scheduler iniciado — recordatorios programados para las 09:00 diariamente.")
 
 
-# Iniciar solo si no estamos en un comando de management (migrate, makemigrations, etc.)
-import sys
-
-if "runserver" in sys.argv:
-    start_scheduler()
+# Iniciar con runserver o gunicorn
+_management_commands = {"migrate", "makemigrations", "collectstatic", "check", "createsuperuser", "shell"}
+if not _management_commands.intersection(sys.argv):
+    try:
+        start_scheduler()
+    except Exception:
+        logger.exception("No se pudo iniciar el scheduler")
