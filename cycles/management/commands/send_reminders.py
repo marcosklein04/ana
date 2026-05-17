@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from cycles.models import CycleProfile
-from cycles.services.whatsapp import send_reminder_for_profile
+from cycles.services.email import send_reminder_email_for_profile
 
 logger = logging.getLogger("cycles")
 
@@ -24,7 +24,7 @@ class Command(BaseCommand):
         profiles = CycleProfile.objects.filter(
             is_active=True,
             next_predicted_period=reminder_target,
-        )
+        ).exclude(email="")
 
         if not profiles.exists():
             self.stdout.write(self.style.WARNING("No hay recordatorios para enviar hoy."))
@@ -35,7 +35,7 @@ class Command(BaseCommand):
         failed = 0
 
         for profile in profiles:
-            log = send_reminder_for_profile(profile)
+            log = send_reminder_email_for_profile(profile, days_before)
             if log is None:
                 skipped += 1
             elif log.status == "sent":

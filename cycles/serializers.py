@@ -12,6 +12,7 @@ class CycleProfileSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "email",
             "whatsapp",
             "last_period_start",
             "cycle_length",

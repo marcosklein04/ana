@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, User, Phone, CalendarClock, Bell, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, CalendarClock, Bell, Loader2 } from "lucide-react";
 import { useProfile } from "@/hooks/use-profile";
 import { EmptyState } from "@/components/EmptyState";
 
@@ -26,6 +26,7 @@ export default function ProfilePage() {
 
   const items = [
     { icon: User, label: "Nombre", value: profile.name },
+    { icon: Mail, label: "Email", value: profile.email || "—" },
     { icon: Phone, label: "WhatsApp", value: profile.whatsapp },
     { icon: CalendarClock, label: "Duración del ciclo", value: `${profile.cycle_length} días` },
     { icon: Bell, label: "Recordatorios", value: profile.reminders_enabled ? "Activados" : "Desactivados" },

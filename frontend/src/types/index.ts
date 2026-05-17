@@ -1,6 +1,7 @@
 export interface Profile {
   id: number;
   name: string;
+  email: string;
   whatsapp: string;
   last_period_start: string | null;
   cycle_length: number;

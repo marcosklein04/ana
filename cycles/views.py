@@ -1,13 +1,14 @@
 import logging
 from datetime import timedelta
 
+from django.conf import settings
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from cycles.models import CycleProfile, PeriodRecord
+from cycles.models import CycleProfile, NotificationLog, PeriodRecord
 from cycles.serializers import (
     CycleProfileSerializer,
     NextPeriodSerializer,
@@ -15,7 +16,7 @@ from cycles.serializers import (
     PeriodRecordSerializer,
 )
 from cycles.services.cycle_calculator import calculate_reminder_date, calculate_phase
-from cycles.services.whatsapp import send_reminder_for_profile
+from cycles.services.email import send_reminder_email_for_profile
 
 logger = logging.getLogger("cycles")
 
@@ -57,7 +58,9 @@ class CycleProfileViewSet(viewsets.ModelViewSet):
         today = timezone.localdate()
         days_remaining = max(0, (profile.next_predicted_period - today).days)
         days_elapsed = (today - profile.last_period_start).days
-        reminder_date = calculate_reminder_date(profile.next_predicted_period)
+        reminder_date = calculate_reminder_date(
+            profile.next_predicted_period, settings.REMINDER_DAYS_BEFORE
+        )
         phase = calculate_phase(days_elapsed)
 
         serializer = NextPeriodSerializer(
@@ -88,8 +91,20 @@ class CycleProfileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        log = send_reminder_for_profile(profile)
+        if not profile.email:
+            return Response(
+                {"detail": "El perfil no tiene email registrado."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        log = send_reminder_email_for_profile(profile)
         if log is None:
             return Response({"detail": "Recordatorio ya enviado hoy."})
+
+        if log.status == NotificationLog.Status.FAILED:
+            return Response(
+                {"detail": "No se pudo enviar el recordatorio. Revisá la configuración de email."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
 
         return Response(NotificationLogSerializer(log).data, status=status.HTTP_201_CREATED)

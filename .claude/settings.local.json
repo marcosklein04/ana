@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile cycles/services/email.py cycles/views.py cycles/models.py cycles/serializers.py cycles/admin.py cycles/management/commands/send_reminders.py cycles/migrations/0002_cycleprofile_email.py config/settings.py)",
+      "Bash(DJANGO_SECRET_KEY=tmp DJANGO_DEBUG=True python manage.py check)"
+    ]
+  }
+}

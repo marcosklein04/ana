@@ -5,6 +5,12 @@ from django.db import models
 
 class CycleProfile(models.Model):
     name = models.CharField("Nombre", max_length=120)
+    email = models.EmailField(
+        "Email",
+        blank=True,
+        default="",
+        help_text="Dirección a la que se envía el recordatorio.",
+    )
     whatsapp_phone = models.CharField(
         "Teléfono WhatsApp",
         max_length=20,

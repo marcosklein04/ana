@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
     DJANGO_ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
-    REMINDER_DAYS_BEFORE=(int, 1),
+    REMINDER_DAYS_BEFORE=(int, 5),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -99,12 +99,24 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:8080"])
 CORS_ALLOW_CREDENTIALS = True
 
-# Twilio
+# Email
+# En dev, el backend por defecto imprime el correo en consola (sin SMTP).
+# En producción, definir EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# y las credenciales del proveedor (Gmail, Resend, SendGrid, SES, etc.).
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Ana <noreply@ana.app>")
+
+# Twilio (ya no se usa para el recordatorio; queda disponible para uso futuro)
 TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID", default="")
 TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN", default="")
 TWILIO_WHATSAPP_FROM = env("TWILIO_WHATSAPP_FROM", default="whatsapp:+14155238886")
 
-# Reminder
+# Reminder — días de anticipación del aviso (default: 5)
 REMINDER_DAYS_BEFORE = env("REMINDER_DAYS_BEFORE")
 
 # APScheduler

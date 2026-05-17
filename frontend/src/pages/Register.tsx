@@ -23,6 +23,7 @@ export default function Register() {
   const existingProfileId = getStoredProfileId();
 
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [date, setDate] = useState<Date>();
   const [cycleLength, setCycleLength] = useState(28);
@@ -49,8 +50,14 @@ export default function Register() {
           setSaving(false);
           return;
         }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+          toast.error("Ingresá un email válido (ahí llega el recordatorio)");
+          setSaving(false);
+          return;
+        }
         const profile = await api.createProfile({
           name: name.trim(),
+          email: email.trim(),
           whatsapp: whatsapp.trim(),
           last_period_start: startDate,
           cycle_length: cycleLength,
@@ -105,6 +112,23 @@ export default function Register() {
               onChange={(e) => setName(e.target.value)}
               className="rounded-xl h-12"
             />
+          </div>
+        )}
+
+        {/* Email — only for first registration (canal del recordatorio) */}
+        {!existingProfileId && (
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+            <Input
+              id="email"
+              placeholder="vos@ejemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-xl h-12"
+              type="email"
+              autoComplete="email"
+            />
+            <p className="text-xs text-muted-foreground">Acá te llega el recordatorio antes de tu período</p>
           </div>
         )}
 

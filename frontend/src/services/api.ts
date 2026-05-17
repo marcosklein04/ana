@@ -29,6 +29,7 @@ export const api = {
 
   createProfile: (data: {
     name: string;
+    email: string;
     whatsapp: string;
     last_period_start?: string;
     cycle_length?: number;

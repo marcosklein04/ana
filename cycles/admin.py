@@ -5,9 +5,9 @@ from cycles.models import CycleProfile, NotificationLog, PeriodRecord
 
 @admin.register(CycleProfile)
 class CycleProfileAdmin(admin.ModelAdmin):
-    list_display = ["name", "whatsapp_phone", "last_period_start", "next_predicted_period", "is_active"]
+    list_display = ["name", "email", "whatsapp_phone", "last_period_start", "next_predicted_period", "is_active"]
     list_filter = ["is_active"]
-    search_fields = ["name", "whatsapp_phone"]
+    search_fields = ["name", "email", "whatsapp_phone"]
 
 
 @admin.register(PeriodRecord)

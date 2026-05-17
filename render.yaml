@@ -23,11 +23,21 @@ services:
         value: ".onrender.com"
       - key: CORS_ALLOWED_ORIGINS
         sync: false
-      - key: TWILIO_ACCOUNT_SID
+      - key: REMINDER_DAYS_BEFORE
+        value: "5"
+      - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.smtp.EmailBackend"
+      - key: EMAIL_HOST
         sync: false
-      - key: TWILIO_AUTH_TOKEN
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_HOST_USER
         sync: false
-      - key: TWILIO_WHATSAPP_FROM
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: DEFAULT_FROM_EMAIL
         sync: false
       - key: PYTHON_VERSION
         value: "3.12.0"
